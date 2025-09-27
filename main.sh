@@ -34,6 +34,23 @@ animate_logo() {
 }
 
 # -------------------------
+# Helper Functions
+# -------------------------
+check_curl() {
+  if ! command -v curl >/dev/null 2>&1; then
+    echo -e "${YELLOW}Installing curl...${RESET}"
+    if command -v apt-get >/dev/null 2>&1; then
+      sudo apt-get update -y && sudo apt-get install -y curl
+    elif command -v yum >/dev/null 2>&1; then
+      sudo yum install -y curl
+    else
+      echo -e "${RED}Error: package manager not found, install curl manually.${RESET}"
+      exit 1
+    fi
+  fi
+}
+
+# -------------------------
 # Show Logo
 # -------------------------
 animate_logo
@@ -46,12 +63,12 @@ echo -e "${GREEN}1) Are you inside VM?${RESET}"
 echo -e "${BLUE}2) Are you IN IDX?${RESET}"
 echo -e "${RED}3) Exit${RESET}"
 echo -ne "${YELLOW}Enter your choice (1-3): ${RESET}"
-read main_choice
+read -r main_choice
 
 case $main_choice in
   1)
     echo -e "${GREEN}You selected: Inside VM${RESET}"
-    echo "Runing Inside VM Commands"
+    echo "Running Inside VM Commands"
     check_curl
     bash <(curl -s https://raw.githubusercontent.com/NothingTheking/all-in-one/refs/heads/main/cd/in-vm.sh)
     ;;
@@ -59,13 +76,14 @@ case $main_choice in
   2)
     echo -e "${BLUE}You selected: Outside IDX${RESET}"
     echo -e "${CYAN}Preparing IDX environment...${RESET}"
-    cd
+    cd ~ || exit 1
     rm -rf myapp flutter
-    cd vps
+    mkdir -p vps
+    cd vps || exit 1
     if [ ! -d ".idx" ]; then
       mkdir .idx
-      cd .idx
-      cat <<EOF > dev.nix
+      cd .idx || exit 1
+      cat <<'EOF' > dev.nix
 { pkgs, ... }: {
   channel = "stable-24.05";
 
@@ -105,7 +123,7 @@ EOF
     fi
 
     echo -ne "${YELLOW}Do you want to continue? (y/n): ${RESET}"
-    read confirm
+    read -r confirm
     case "$confirm" in
       [yY]*)
         echo -e "${GREEN}Running external setup script...${RESET}"
@@ -136,4 +154,4 @@ esac
 # -------------------------
 # Footer
 # -------------------------
-echo -e "${CYAN}Made by AYUSH VPS Panel${RESET}"
+echo -e "${CYAN}Made by NothingTheKing${RESET}"
