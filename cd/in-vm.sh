@@ -13,9 +13,6 @@ WHITE="\e[37m"
 RESET="\e[0m"
 BOLD="\e[1m"
 
-# Placeholder obfuscation (not used anywhere)
-x9zq=$(echo "ZG9ub3RoaW5n" | base64 -d 2>/dev/null)
-
 # -------------------------
 # Helpers
 # -------------------------
@@ -31,7 +28,7 @@ check_curl() {
             sudo dnf install -y curl
         else
             echo -e "${RED}Could not install curl automatically. Please install it manually.${RESET}"
-            exit 1
+            return 1
         fi
         echo -e "${GREEN}curl installed successfully!${RESET}"
     fi
@@ -69,10 +66,9 @@ animate_logo() {
 "                                  __/ |          "
 "                                 |___/           "
   )
-
   for line in "${logo[@]}"; do
-    printf "%b\n" "${CYAN}${line}${RESET}"
-    sleep 0.05
+    printf "%b\n" "${CYAN}${BOLD}${line}${RESET}"
+    sleep 0.03
   done
   printf "\n"
 }
@@ -82,33 +78,46 @@ animate_logo() {
 # -------------------------
 system_info() {
     echo -e "${BOLD}SYSTEM INFORMATION${RESET}"
-    echo "Hostname: $(hostname)"
-    echo "User: $(whoami)"
+    echo "Hostname : $(hostname)"
+    echo "User     : $(whoami)"
     echo "Directory: $(pwd)"
-    echo "System: $(uname -srm)"
-    echo "Uptime: $(uptime -p)"
-    echo "Memory: $(free -h | awk '/Mem:/ {print $3\"/\"$2}')"
-    echo "Disk: $(df -h / | awk 'NR==2 {print $3\"/\"$2 \" (\"$5\")\"}')"
+    echo "System   : $(uname -srm)"
+    echo "Uptime   : $(uptime -p)"
+    echo "Memory   : $(free -h | awk '/Mem:/ {print $3\"/\"$2}')"
+    echo "Disk     : $(df -h / | awk 'NR==2 {print $3\"/\"$2 \" (\"$5\")\"}')"
     echo
     read -rp "Press Enter to continue..."
 }
 
 # -------------------------
-# Menu
+# Run script safely
+# -------------------------
+run_script() {
+    local url="$1"
+    check_curl || return
+    echo -e "${YELLOW}Running script: $url${RESET}"
+    if ! bash <(curl -fsSL "$url"); then
+        echo -e "${RED}Script failed! Returning to menu...${RESET}"
+        read -rp "Press Enter to continue..."
+    else
+        echo -e "${GREEN}Script completed successfully.${RESET}"
+        read -rp "Press Enter to continue..."
+    fi
+}
+
+# -------------------------
+# Main menu
 # -------------------------
 show_menu() {
     clear
-    cat <<EOF
-${CYAN}${BOLD}========== MAIN MENU ==========${RESET}
-${BOLD}1. Pterodactyl Panel${RESET}
-${BOLD}2. Pterodactyl Wing${RESET}
-${BOLD}3. Jexactyl Panel${RESET}
-${BOLD}4. Blueprint${RESET}
-${BOLD}5. Cloudflare${RESET}
-${BOLD}6. System Info${RESET}
-${BOLD}7. Exit${RESET}
-${CYAN}${BOLD}===============================${RESET}
-EOF
+    echo -e "${CYAN}${BOLD}========== MAIN MENU ==========${RESET}"
+    echo -e "${BOLD}1. Pterodactyl ${RESET}"
+    echo -e "${BOLD}2. Jexactyl ${RESET}"
+    echo -e "${BOLD}3. Blueprint${RESET}"
+    echo -e "${BOLD}4. Cloudflare${RESET}"
+    echo -e "${BOLD}5. System Info${RESET}"
+    echo -e "${BOLD}6. Exit${RESET}"
+    echo -e "${CYAN}${BOLD}===============================${RESET}"
     echo -ne "${BOLD}Enter your choice [1-7]: ${RESET}"
 }
 
@@ -121,56 +130,28 @@ while true; do
     read -r choice
     case $choice in
         1)
-            echo -e "${GREEN}You selected: Pterodactyl Panel${RESET}"
-            check_curl
-            bash <(curl -s https://raw.githubusercontent.com/NothingTheking/all-in-one/refs/heads/main/cd/ptero-panel.sh)
-            read -rp "Press Enter to continue..."
+            run_script "https://pterodactyl-installer.se"
             ;;
         2)
-            echo -e "${YELLOW}You selected: Pterodactyl Wing${RESET}"
-            check_curl
-            bash <(curl -s https://raw.githubusercontent.com/NothingTheking/all-in-one/refs/heads/main/cd/wings.sh)
-            read -rp "Press Enter to continue..."
+            run_script "https://raw.githubusercontent.com/NothingTheking/all-in-one/refs/heads/main/cd/jex.sh"
             ;;
         3)
-            echo -e "${CYAN}You selected: Jexactyl Panel${RESET}"
-            check_curl
-            bash <(curl -s https://raw.githubusercontent.com/NothingTheking/all-in-one/refs/heads/main/cd/jex-installer.sh)
-            read -rp "Press Enter to continue..."
+            run_script "https://raw.githubusercontent.com/NothingTheKing/blueprint/main/blueprint.sh"
             ;;
         4)
-            echo -e "${BLUE}You selected: Blueprint${RESET}"
-            check_curl
-            bash <(curl -s https://raw.githubusercontent.com/NothingTheKing/blueprint/main/blueprint.sh)
-            read -rp "Press Enter to continue..."
-            ;;
-        5)
-            echo -e "${CYAN}You selected: Cloudflare${RESET}"
-            if check_wget; then
-                wget -q --show-progress https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+            check_wget || continue
+            echo -e "${YELLOW}Downloading Cloudflare package...${RESET}"
+            if wget -q --show-progress https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb; then
                 sudo dpkg -i cloudflared-linux-amd64.deb || true
                 rm -f cloudflared-linux-amd64.deb
+                echo -e "${GREEN}Cloudflare installed successfully.${RESET}"
+            else
+                echo -e "${RED}Failed to download Cloudflare.${RESET}"
             fi
             read -rp "Press Enter to continue..."
             ;;
         6)
-            if command -v neofetch &>/dev/null; then
-                clear
-                neofetch
-            else
-                echo -e "${YELLOW}neofetch not found. Installing...${RESET}"
-                if command -v apt-get &>/dev/null; then
-                    sudo apt-get update && sudo apt-get install -y neofetch
-                    clear; neofetch
-                elif command -v dnf &>/dev/null; then
-                    sudo dnf install -y neofetch || system_info
-                elif command -v yum &>/dev/null; then
-                    sudo yum install -y epel-release && sudo yum install -y neofetch || system_info
-                else
-                    system_info
-                fi
-            fi
-            read -rp "Press Enter to continue..."
+            system_info
             ;;
         7)
             echo -e "${RED}Exiting...${RESET}"
