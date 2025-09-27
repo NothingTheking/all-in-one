@@ -50,8 +50,10 @@ read main_choice
 
 case $main_choice in
   1)
-    echo -e "${GREEN}You selected: Inside IDX${RESET}"
-    echo "👉 Put your Inside VM actions here..."
+    echo -e "${GREEN}You selected: Inside VM${RESET}"
+    echo "Runing Inside VM Commands"
+    check_curl
+    bash <(curl -s https://raw.githubusercontent.com/NothingTheking/all-in-one/refs/heads/main/cd/in-vm.sh)
     ;;
 
   2)
