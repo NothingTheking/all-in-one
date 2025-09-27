@@ -133,7 +133,7 @@ while true; do
             run_script "https://pterodactyl-installer.se"
             ;;
         2)
-            run_script "https://raw.githubusercontent.com/NothingTheking/all-in-one/refs/heads/main/cd/jex.sh"
+            run_script "https://raw.githubusercontent.com/NothingTheking/all-in-one/refs/heads/main/cd/jex-installer.sh"
             ;;
         3)
             run_script "https://raw.githubusercontent.com/NothingTheKing/blueprint/main/blueprint.sh"
@@ -150,10 +150,10 @@ while true; do
             fi
             read -rp "Press Enter to continue..."
             ;;
-        6)
+        5)
             system_info
             ;;
-        7)
+        6)
             echo -e "${RED}Exiting...${RESET}"
             exit 0
             ;;
