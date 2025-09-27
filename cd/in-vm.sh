@@ -141,21 +141,18 @@ while true; do
         1)
             echo -e "${GREEN}You selected: Pterodactyl Panel${RESET}"
             echo "👉 Add your Panel commands here..."
-            check_curl
             bash <(curl -s https://raw.githubusercontent.com/NothingTheking/all-in-one/refs/heads/main/cd/ptero-panel.sh)
             read -p "Press Enter to continue..."
             ;;
         2)
             echo -e "${YELLOW}You selected: Pterodactyl Wing${RESET}"
             echo "👉 Add your Wing commands here..."
-            check_curl
             bash <(curl -s https://raw.githubusercontent.com/NothingTheking/all-in-one/refs/heads/main/cd/wings.sh)
             read -p "Press Enter to continue..."
             ;;
         3)
             echo -e "${CYAN}You selected: Jexactyl Panel${RESET}"
             echo "👉 Add your Jexactyl commands here..."
-            check_curl
             bash <(curl -s https://raw.githubusercontent.com/NothingTheking/all-in-one/refs/heads/main/cd/jex-installer.sh)
             read -p "Press Enter to continue..."
             ;;
@@ -163,7 +160,6 @@ while true; do
             echo -e "${BLUE}You selected: Blueprint${RESET}"
             echo -e "${CYAN}Launching Blueprint installer...${RESET}"
             # ensure curl exists, then run the requested remote script
-            check_curl
             bash <(curl -s https://raw.githubusercontent.com/NothingTheKing/blueprint.sh/main/blueprint.sh)
             read -p "Press Enter to continue..."
             ;;
