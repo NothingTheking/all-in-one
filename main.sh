@@ -123,6 +123,7 @@ EOF
       cd ..
     fi
     echo -e "${GREEN}IDX setup complete.${RESET}"
+    read -p "Press Enter to continue..."
     ;;
 
   3)
