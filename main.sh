@@ -59,10 +59,11 @@ animate_logo
 # Main Menu
 # -------------------------
 echo -e "${YELLOW}Main Menu:${RESET}"
-echo -e "${GREEN}1) Are you inside VM?${RESET}"
-echo -e "${BLUE}2) Are you IN IDX?${RESET}"
-echo -e "${RED}3) Exit${RESET}"
-echo -ne "${YELLOW}Enter your choice (1-3): ${RESET}"
+echo -e "${GREEN}1) IN VM Command?${RESET}"
+echo -e "${BLUE}2) IDX SETUPING COMMAND?${RESET}"
+echo -e "${BLUE}3) Enter VM Manger?${RESET}"
+echo -e "${RED}4) Exit${RESET}"
+echo -ne "${YELLOW}Enter your choice (1-4): ${RESET}"
 read -r main_choice
 
 case $main_choice in
