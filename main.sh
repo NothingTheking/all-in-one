@@ -59,9 +59,9 @@ animate_logo
 # Main Menu
 # -------------------------
 echo -e "${YELLOW}Main Menu:${RESET}"
-echo -e "${GREEN}1) IN VM Command?${RESET}"
-echo -e "${BLUE}2) IDX SETUPING COMMAND?${RESET}"
-echo -e "${BLUE}3) Enter VM Manger?${RESET}"
+echo -e "${GREEN}1) IN VM Command${RESET}"
+echo -e "${BLUE}2) IDX Setup${RESET}"
+echo -e "${CYAN}3) VM Manager (External Script)${RESET}"
 echo -e "${RED}4) Exit${RESET}"
 echo -ne "${YELLOW}Enter your choice (1-4): ${RESET}"
 read -r main_choice
@@ -75,7 +75,7 @@ case $main_choice in
     ;;
 
   2)
-    echo -e "${BLUE}You selected: Outside IDX${RESET}"
+    echo -e "${BLUE}You selected: IDX Setup${RESET}"
     echo -e "${CYAN}Preparing IDX environment...${RESET}"
     cd ~ || exit 1
     rm -rf myapp flutter
@@ -122,32 +122,22 @@ case $main_choice in
 EOF
       cd ..
     fi
-
-    echo -ne "${YELLOW}Do you want to continue? (y/n): ${RESET}"
-    read -r confirm
-    case "$confirm" in
-      [yY]*)
-        echo -e "${GREEN}Running external setup script...${RESET}"
-        bash <(curl -fsSL https://raw.githubusercontent.com/hopingboyz/vms/main/vm.sh)
-        ;;
-      [nN]*)
-        echo -e "${RED}Operation cancelled.${RESET}"
-        exit 0
-        ;;
-      *)
-        echo -e "${RED}Invalid input! Operation cancelled.${RESET}"
-        exit 1
-        ;;
-    esac
+    echo -e "${GREEN}IDX setup complete.${RESET}"
     ;;
 
   3)
+    echo -e "${CYAN}Launching VM Manager...${RESET}"
+    check_curl
+    bash <(curl -fsSL https://raw.githubusercontent.com/hopingboyz/vms/main/vm.sh)
+    ;;
+
+  4)
     echo -e "${RED}Exiting...${RESET}"
     exit 0
     ;;
 
   *)
-    echo -e "${RED}Invalid choice! Please select 1, 2, or 3.${RESET}"
+    echo -e "${RED}Invalid choice! Please select 1, 2, 3, or 4.${RESET}"
     exit 1
     ;;
 esac
